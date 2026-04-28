@@ -1,0 +1,21 @@
+{
+  "name": "Mostremos - Citizen Reporting",
+  "short_name": "Mostremos",
+  "description": "Report infrastructure issues offline and sync later.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0056b3",
+  "icons": [
+    {
+      "src": "/images/logo_120sq.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
