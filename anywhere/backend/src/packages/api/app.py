@@ -22,7 +22,7 @@ def create_app():
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     # Configure session and initialize OAuth
-    app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'default-dev-secret-key-123')
+    app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'default-dev-secret-key-12345ABCDEF')
     auth.oauth.init_app(app)
 
     # Register Blueprints

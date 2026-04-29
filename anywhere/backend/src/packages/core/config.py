@@ -29,6 +29,7 @@ DEMO_BOUNDING_BOX = GeoBoundingBox(
     min_lon=-67.8, max_lon=-67.3
 )
 
+APP_NAME = "CrowdSource"
 APP_INSTANCE = config.get("APP_INSTANCE", "devel")  # isolate devel, test, prod
 
 HOME = Path.home()
@@ -43,10 +44,10 @@ DATABASE_PATH = f"sqlite:///{DATABASE}"
 STORAGE_DIR = config.get("STORAGE_DIR", DEFAULT_STORAGE_DIR)
 
 # Admin Authentication
-ADMIN_API_KEY = config.get("ADMIN_API_KEY", "dev-secret-admin-key-123")
+ADMIN_API_KEY = config.get("ADMIN_API_KEY", "dev-secret-admin-key-12345ABCDEF")
 
 # User Authentication
-JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-your-super-secret-key-123")
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", 'default-dev-secret-key-12345ABCDEF')
 JWT_ALGORITHM = "HS256"
 
 # Google OAuth
