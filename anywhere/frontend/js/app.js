@@ -1,100 +1,93 @@
 // js/app.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Application State
-    AuthManager.checkAuthState();
-    if (typeof StorageAdapter !== 'undefined') {
-        StorageAdapter.broadcastCount(); // Ensure UI is updated on initial load
-    }
-
-    // 2. Cache DOM Elements
+    // 1. Cache DOM Elements
     const elements = {
         googleLoginBtn: document.getElementById('google-login-btn'),
-        authToggleBtn: document.getElementById('auth-toggle-btn'),
-        reportForm: document.getElementById('report-form'),
-        forceSyncBtn: document.getElementById('force-sync-btn'),
-        category: document.getElementById('category'),
-        notes: document.getElementById('notes'),
-        latitude: document.getElementById('latitude'),
-        longitude: document.getElementById('longitude'),
-        canvas: document.getElementById('photo-canvas')
+                          authToggleBtn: document.getElementById('auth-toggle-btn'),
+                          reportForm: document.getElementById('report-form'),
+                          forceSyncBtn: document.getElementById('force-sync-btn'),
+                              category: document.getElementById('category'),
+                          notes: document.getElementById('notes'),
+                          latitude: document.getElementById('latitude'),
+                          longitude: document.getElementById('longitude'),
+                          canvas: document.getElementById('photo-canvas')
     };
 
-    // 3. Bind UI Action Listeners
-    if (elements.googleLoginBtn) elements.googleLoginBtn.addEventListener('click', AuthManager.login);
-    if (elements.authToggleBtn) elements.authToggleBtn.addEventListener('click', AuthManager.logout);
-    if (elements.forceSyncBtn) elements.forceSyncBtn.addEventListener('click', () => SyncManager.syncPendingReports());
+    // 2. Bind Global System Event Listeners FIRST (The Fix)
+    window.addEventListener('online', () => {
+        if (typeof SyncManager !== 'undefined') SyncManager.syncPendingReports();
+    });
 
-    // 4. Form Submission Orchestration
-    if (elements.reportForm) {
-        elements.reportForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        window.addEventListener('auth-state-changed', (e) => {
+            if (e.detail.isAuthenticated) {
+                if (typeof SyncManager !== 'undefined') SyncManager.syncPendingReports();
+                if (typeof cameraManager !== 'undefined') cameraManager.startCamera();
+                updateLocationDisplayUI(); // This will now fire properly!
+            } else {
+                if (typeof cameraManager !== 'undefined') cameraManager.stopCamera();
+            }
+        });
 
-            // Attempt to grab coordinates from hidden inputs; fallback to fresh fetch if empty
-            let lat = parseFloat(elements.latitude.value);
-            let lon = parseFloat(elements.longitude.value);
-            
-            if (!lat || !lon) {
-                try {
-                    lat = await GeolocationService.getLatitude();
-                    lon = await GeolocationService.getLongitude();
-                } catch (error) {
-                    console.error("No se pudo obtener la ubicación para el envío.", error);
+        window.addEventListener('pending-reports-changed', (e) => {
+            const count = e.detail.count;
+            const statusDiv = document.getElementById('sync-status');
+            const countSpan = document.getElementById('pending-count');
+
+            if (statusDiv && countSpan) {
+                if (count > 0) {
+                    statusDiv.classList.remove('hidden');
+                    countSpan.textContent = count;
+                } else {
+                    statusDiv.classList.add('hidden');
                 }
             }
-
-            const reportData = {
-                category: elements.category.value,
-                notes: elements.notes.value,
-                latitude: lat || 0.0,
-                longitude: lon || 0.0,
-                imageBlob: await getCanvasBlob(elements.canvas)
-            };
-
-            if (!reportData.imageBlob) {
-                alert("Por favor, capture una foto primero.");
-                return;
-            }
-
-            await submitReport(reportData, elements.reportForm);
         });
-    }
 
-    // 5. Bind Global System Event Listeners
-    
-    // Trigger background sync when device comes back online
-    window.addEventListener('online', () => {
-        if (typeof SyncManager !== 'undefined') {
-            SyncManager.syncPendingReports();
+        // 3. Bind UI Action Listeners
+        if (elements.googleLoginBtn) elements.googleLoginBtn.addEventListener('click', AuthManager.login);
+        if (elements.authToggleBtn) elements.authToggleBtn.addEventListener('click', AuthManager.logout);
+        if (elements.forceSyncBtn) elements.forceSyncBtn.addEventListener('click', () => SyncManager.syncPendingReports());
+
+        // 4. Form Submission Orchestration
+        if (elements.reportForm) {
+            elements.reportForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                let lat = parseFloat(elements.latitude.value);
+                let lon = parseFloat(elements.longitude.value);
+
+                if (!lat || !lon) {
+                    try {
+                        lat = await GeolocationService.getLatitude();
+                        lon = await GeolocationService.getLongitude();
+                    } catch (error) {
+                        console.error("No se pudo obtener la ubicación para el envío.", error);
+                    }
+                }
+
+                const reportData = {
+                    category: elements.category.value,
+                    notes: elements.notes.value,
+                    latitude: lat || 0.0,
+                    longitude: lon || 0.0,
+                    imageBlob: await getCanvasBlob(elements.canvas)
+                };
+
+                if (!reportData.imageBlob) {
+                    alert("Por favor, capture una foto primero.");
+                    return;
+                }
+
+                await submitReport(reportData, elements.reportForm);
+            });
         }
-    });
 
-    // React to Auth changes (Login/Logout)
-    window.addEventListener('auth-state-changed', (e) => {
-        if (e.detail.isAuthenticated) {
-            if (typeof SyncManager !== 'undefined') SyncManager.syncPendingReports();
-            if (typeof cameraManager !== 'undefined') cameraManager.startCamera();
-            updateLocationDisplayUI(); 
-        } else {
-            if (typeof cameraManager !== 'undefined') cameraManager.stopCamera();
+        // 5. Initialize Application State LAST
+        AuthManager.checkAuthState();
+        if (typeof StorageAdapter !== 'undefined') {
+            StorageAdapter.broadcastCount();
         }
-    });
-
-    // React to Database changes to update the offline badge
-    window.addEventListener('pending-reports-changed', (e) => {
-        const count = e.detail.count;
-        const statusDiv = document.getElementById('sync-status');
-        const countSpan = document.getElementById('pending-count');
-
-        if (statusDiv && countSpan) {
-            if (count > 0) {
-                statusDiv.classList.remove('hidden');
-                countSpan.textContent = count;
-            } else {
-                statusDiv.classList.add('hidden');
-            }
-        }
-    });
 });
 
 /**
