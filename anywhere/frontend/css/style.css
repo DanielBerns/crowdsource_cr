@@ -378,3 +378,8 @@ hr.divider {
 .category-btn-full {
     grid-column: 1 / -1;
 }
+
+/* Indent all nested lists by 2rem */
+ul ul, ol ol, ul ol, ol ul {
+    padding-left: 2rem;
+}
