@@ -6,6 +6,7 @@ class CameraModule {
         this.canvasElement = document.getElementById('photo-canvas');
         this.captureBtn = document.getElementById('capture-btn');
         this.stream = null;
+        this.shouldBeOn = false;
 
         this.init();
     }
@@ -13,7 +14,14 @@ class CameraModule {
     init() {
         if (!this.videoElement || !this.captureBtn) return;
 
-        this.captureBtn.addEventListener('click', () => this.takePhoto());
+        this.captureBtn.addEventListener('click', () => {
+            // If the video is hidden, we are viewing a captured photo and want to retake it
+            if (this.videoElement.classList.contains('hidden')) {
+                this.startCamera();
+            } else {
+                this.takePhoto();
+            }
+        });
     }
 
     async startCamera() {
@@ -24,19 +32,27 @@ class CameraModule {
                 video: { facingMode: 'environment' },
                 audio: false
             });
-            
+
             if (!this.shouldBeOn) {
                 // stopCamera was called while waiting for user permission
                 stream.getTracks().forEach(track => track.stop());
                 return;
             }
-            
+
             this.stream = stream;
             this.videoElement.srcObject = this.stream;
+
+            // UI Management: Show video, hide canvas, reset button state
             this.videoElement.classList.remove('hidden');
+            if (this.canvasElement) this.canvasElement.classList.add('hidden');
+            if (this.captureBtn) {
+                this.captureBtn.textContent = "Capturar Foto";
+                this.captureBtn.classList.remove('btn-success');
+                this.captureBtn.classList.add('btn-secondary');
+            }
         } catch (error) {
-            console.error('Error accessing the camera:', error);
-            alert('Unable to access the camera. Please check your device permissions.');
+            console.error('Error al acceder a la cámara:', error);
+            alert('No se pudo acceder a la cámara. Por favor, verifica los permisos de tu dispositivo.');
         }
     }
 
@@ -44,8 +60,10 @@ class CameraModule {
         this.shouldBeOn = false;
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
-            this.videoElement.classList.add('hidden');
             this.stream = null;
+        }
+        if (this.videoElement) {
+            this.videoElement.classList.add('hidden');
         }
     }
 
@@ -61,14 +79,17 @@ class CameraModule {
         // Draw the current video frame onto the canvas
         context.drawImage(this.videoElement, 0, 0, this.canvasElement.width, this.canvasElement.height);
 
-        // Visual feedback
-        this.captureBtn.textContent = "Photo Captured ✓";
-        this.captureBtn.style.backgroundColor = "#28a745";
+        // UI Feedback: Show the static photo, hide the live video feed
+        this.canvasElement.classList.remove('hidden');
+        this.videoElement.classList.add('hidden');
 
-        setTimeout(() => {
-            this.captureBtn.textContent = "Retake Photo";
-            this.captureBtn.style.backgroundColor = "";
-        }, 2000);
+        // Update button to indicate retake action
+        this.captureBtn.textContent = "Volver a Tomar";
+        this.captureBtn.classList.remove('btn-secondary');
+        this.captureBtn.classList.add('btn-success');
+
+        // Stop the camera hardware to save battery while viewing the photo
+        this.stopCamera();
     }
 }
 
