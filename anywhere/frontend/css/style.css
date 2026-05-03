@@ -350,3 +350,31 @@ hr.divider {
     align-items: center;
     min-height: 2.5rem;
 }
+
+/* Append to css/style.css */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.category-btn {
+    padding: 15px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: background-color 0.1s;
+    touch-action: manipulation;
+}
+
+.category-btn:active {
+    background-color: #e2e4e8;
+    transform: scale(0.98);
+}
+
+.category-btn-full {
+    grid-column: 1 / -1;
+}

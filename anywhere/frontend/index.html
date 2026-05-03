@@ -32,12 +32,25 @@
             <h2 class="mb-4">Nuevo Reporte</h2>
             <form id="report-form">
                 <div class="form-group">
-                    <label for="category" class="form-label">Categoría</label>
-                    <select id="category" name="category" required class="form-control">
-                        <option value="">Seleccione una Categoría...</option>
-                    </select>
-                </div>
+                    <label class="form-label">Categoría</label>
 
+                    <!-- Hidden input stores the final ID for app.js to collect -->
+                    <input type="hidden" id="category" name="category" required>
+
+                    <!-- Success State: Shows the selected path and allows resetting -->
+                    <div id="selected-category-container" class="form-control hidden" style="background-color: #e8f5e9; border-color: #28a745; display: flex; justify-content: space-between; align-items: center;">
+                        <span id="selected-category-text" style="color: #155724; font-weight: 500;"></span>
+                        <button type="button" id="reset-category-btn" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.85em;">Cambiar</button>
+                    </div>
+
+                    <!-- Interactive Word Tree Keyboard -->
+                    <div id="category-keyboard-area" style="background-color: #f4f4f9; padding: 15px; border: 1px solid #ced4da; border-radius: 8px;">
+                        <div id="category-breadcrumb" style="font-size: 0.9em; color: #555; margin-bottom: 15px; min-height: 1.2em; font-weight: 500;">Seleccione...</div>
+                        <div id="category-keys" class="category-grid">
+                            <!-- Buttons injected via JavaScript -->
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Evidencia Fotográfica</label>
                     <video id="camera-feed" class="camera-feed hidden" autoplay playsinline></video>
