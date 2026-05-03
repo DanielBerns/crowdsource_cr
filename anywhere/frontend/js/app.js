@@ -1,20 +1,20 @@
-// js/app.js
-
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Cache DOM Elements
     const elements = {
         googleLoginBtn: document.getElementById('google-login-btn'),
-                          authToggleBtn: document.getElementById('auth-toggle-btn'),
-                          reportForm: document.getElementById('report-form'),
-                          forceSyncBtn: document.getElementById('force-sync-btn'),
-                              category: document.getElementById('category'),
-                          notes: document.getElementById('notes'),
-                          latitude: document.getElementById('latitude'),
-                          longitude: document.getElementById('longitude'),
-                          canvas: document.getElementById('photo-canvas')
+        authToggleBtn: document.getElementById('auth-toggle-btn'),
+        reportForm: document.getElementById('report-form'),
+        forceSyncBtn: document.getElementById('force-sync-btn'),
+        category: document.getElementById('category'),
+        notes: document.getElementById('notes'),
+        latitude: document.getElementById('latitude'),
+        longitude: document.getElementById('longitude'),
+        canvas: document.getElementById('photo-canvas'),
+        submitBtn: document.getElementById('submit-report-btn'),
+        refreshLocationBtn: document.getElementById('refresh-location-btn')
     };
 
-    // 2. Bind Global System Event Listeners FIRST (The Fix)
+    // 2. Bind Global System Event Listeners FIRST
     window.addEventListener('online', () => {
         if (typeof SyncManager !== 'undefined') SyncManager.syncPendingReports();
     });
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.detail.isAuthenticated) {
                 if (typeof SyncManager !== 'undefined') SyncManager.syncPendingReports();
                 if (typeof cameraManager !== 'undefined') cameraManager.startCamera();
-                updateLocationDisplayUI(); // This will now fire properly!
+                updateLocationDisplayUI();
             } else {
                 if (typeof cameraManager !== 'undefined') cameraManager.stopCamera();
             }
@@ -49,11 +49,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.authToggleBtn) elements.authToggleBtn.addEventListener('click', AuthManager.logout);
         if (elements.forceSyncBtn) elements.forceSyncBtn.addEventListener('click', () => SyncManager.syncPendingReports());
 
+        // NEW: Refresh Location Listener
+        if (elements.refreshLocationBtn) {
+            elements.refreshLocationBtn.addEventListener('click', async () => {
+                // Disable the button to prevent spam clicking
+                elements.refreshLocationBtn.disabled = true;
+                await updateLocationDisplayUI();
+                elements.refreshLocationBtn.disabled = false;
+            });
+        }
+
         // 4. Form Submission Orchestration
         if (elements.reportForm) {
             elements.reportForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
+                if (!elements.category.value) {
+                    alert("Por favor, seleccione una categoría interactuando con las opciones.");
+                    return;
+                }
+
+                // Read from inputs. If empty, attempt a fallback fetch just in case.
                 let lat = parseFloat(elements.latitude.value);
                 let lon = parseFloat(elements.longitude.value);
 
@@ -79,7 +95,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                // UX: Show processing state
+                const originalBtnText = elements.submitBtn.textContent;
+                elements.submitBtn.disabled = true;
+                elements.submitBtn.textContent = "Procesando...";
+
                 await submitReport(reportData, elements.reportForm);
+
+                // Restore button state
+                elements.submitBtn.disabled = false;
+                elements.submitBtn.textContent = originalBtnText;
+
+                // Reset the selected category UI
+                const resetBtn = document.getElementById('reset-category-btn');
+                if (resetBtn) resetBtn.click();
             });
         }
 
@@ -120,13 +149,13 @@ function getCanvasBlob(canvas) {
 }
 
 /**
- * Updates the location UI by interacting with the GeolocationService.
+ * Updates the location UI passively or when forced by the refresh button.
  */
 async function updateLocationDisplayUI() {
     const locDisplay = document.getElementById('location-display');
     const latInput = document.getElementById('latitude');
     const lonInput = document.getElementById('longitude');
-    
+
     if (!locDisplay) return;
 
     locDisplay.textContent = "Buscando ubicación...";
@@ -136,13 +165,13 @@ async function updateLocationDisplayUI() {
         const coords = await GeolocationService.getCoordinates();
         locDisplay.textContent = `Lat: ${coords.latitude.toFixed(5)}, Lon: ${coords.longitude.toFixed(5)}`;
         locDisplay.style.color = "#28a745"; // Success green
-        
+
         if (latInput && lonInput) {
             latInput.value = coords.latitude;
             lonInput.value = coords.longitude;
         }
     } catch (error) {
-        locDisplay.textContent = error.message; 
+        locDisplay.textContent = error.message;
         locDisplay.style.color = "#dc3545"; // Error red
     }
 }

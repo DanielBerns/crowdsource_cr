@@ -60,9 +60,16 @@
 
                 <div class="form-group">
                     <label class="form-label">Ubicación GPS</label>
-                    <div id="location-display" class="form-control location-display">
-                        Buscando ubicación...
+
+                    <div style="display: flex; gap: 10px; align-items: stretch;">
+                        <div id="location-display" class="form-control location-display" style="flex-grow: 1; margin: 0;">
+                            Buscando ubicación...
+                        </div>
+                        <button type="button" id="refresh-location-btn" class="btn btn-secondary" title="Actualizar ubicación" style="white-space: nowrap;">
+                            Actualizar 📍
+                        </button>
                     </div>
+
                     <input type="hidden" id="latitude" name="latitude" value="">
                     <input type="hidden" id="longitude" name="longitude" value="">
                 </div>
