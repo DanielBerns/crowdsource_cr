@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = 'crowdsource-static-v7';
+const CACHE_NAME = 'crowdsource-static-v9';
 
 // All static UI assets required for the app to boot and function offline
 const ASSETS_TO_CACHE = [
@@ -10,13 +10,22 @@ const ASSETS_TO_CACHE = [
     '/privacidad.html',
     '/terminos.html',
     '/css/style.css',
-    '/js/app.js',
+    
+    // Updated Modular JavaScript Files
+    '/js/categories.js',
+    '/js/auth.js',
+    '/js/api.js',
+    '/js/geolocation.js',
     '/js/db.js',
+    '/js/form-ui.js',
     '/js/camera.js',
-    '/images/logo_1200sq.png',
+    '/js/app.js',
+    
+    '/images/logo_120sq.png',
     '/manifest.json',
+    
     // External dependencies must also be cached for offline use
-'https://unpkg.com/dexie/dist/dexie.js'
+    'https://unpkg.com/dexie/dist/dexie.js'
 ];
 
 // 1. Install Event - Cache Static Assets
@@ -70,11 +79,6 @@ self.addEventListener('fetch', (event) => {
             // Otherwise, attempt to fetch from the network
             return fetch(event.request).catch((error) => {
                 console.error('[Service Worker] Fetch failed and no cache found for:', event.request.url, error);
-
-                // Optional: If you want to serve a specific offline fallback page for
-                // unrecognized HTML requests, you could add that logic here.
-                // For a Single Page Application (SPA), returning nothing or the root index
-                // is usually sufficient since the UI state handles the "offline" warning.
             });
         })
     );

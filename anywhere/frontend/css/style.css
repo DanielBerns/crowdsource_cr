@@ -341,3 +341,12 @@ hr.divider {
     border-top: 1px solid var(--border-color);
     margin: 1.5rem 0;
 }
+
+.location-display {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+}
