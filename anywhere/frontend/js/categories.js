@@ -4,7 +4,24 @@ const categoryWordTree = {
         "Venta": "property.sale"
     },
     "Comercio": {
-        "Precio minorista": "retail.price"
+        "Mayorista": {
+            "Precio": "wholesale.price",
+            "Ubicación": "wholesale.location",
+            "Altas": "wholesale.start",
+            "Bajas": "wholesale.stop",
+        },
+        "Minorista": {
+            "Precio": "retail.price",
+            "Ubicación": "retail.location",
+            "Altas": "retail.start",
+            "Bajas": "retail.stop",
+        },
+        "Chino": {
+            "Precio": "chinese.price",
+            "Ubicación": "chinese.location",
+            "Altas": "chinese.start",
+            "Bajas": "chinese.stop",
+        }
     },
     "Vía Pública": {
         "Calles": {
