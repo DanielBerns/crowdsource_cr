@@ -5,23 +5,33 @@ const categoryWordTree = {
     },
     "Comercio": {
         "Mayorista": {
-            "Precio": "wholesale.price",
-            "Ubicación": "wholesale.location",
-            "Altas": "wholesale.start",
-            "Bajas": "wholesale.stop",
+            "Nacional": {
+                "Precio": "wholesale.national.price",
+                "Ubicación": "wholesale.national.location",
+                "Altas": "wholesale.national.start",
+                "Bajas": "wholesale.national.stop",
+            },
+            "Regional": {
+                "Precio": "wholesale.regional.price",
+                "Ubicación": "wholesale.regional.location",
+                "Altas": "wholesale.regional.start",
+                "Bajas": "wholesale.regional.stop",
+            },
         },
         "Minorista": {
-            "Precio": "retail.price",
-            "Ubicación": "retail.location",
-            "Altas": "retail.start",
-            "Bajas": "retail.stop",
+            "Supermercado": {
+                "Precio": "retail.supermarket.price",
+                "Ubicación": "retail.supermarket.location",
+                "Altas": "retail.supermarket.start",
+                "Bajas": "retail.supermarket.stop",
+            },
+            "Boliche": {
+                "Precio": "retail.momanddad.price",
+                "Ubicación": "retail.momanddad.location",
+                "Altas": "retail.momanddad.start",
+                "Bajas": "retail.momanddad.stop",
+            },
         },
-        "Chino": {
-            "Precio": "chinese.price",
-            "Ubicación": "chinese.location",
-            "Altas": "chinese.start",
-            "Bajas": "chinese.stop",
-        }
     },
     "Vía Pública": {
         "Calles": {
